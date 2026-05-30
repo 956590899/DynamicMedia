@@ -25,33 +25,35 @@ except ImportError:
     import soundcard
 
 try:
-    from PyQt5.QtWidgets import (
+    from PySide6.QtWidgets import (
         QApplication, QMainWindow, QWidget, QVBoxLayout, 
         QLabel, QPushButton, QHBoxLayout, QGroupBox, QTextEdit,
-        QDockWidget, QFrame
+        QDockWidget, QFrame, QMenu
     )
-    from PyQt5.QtGui import (
+    from PySide6.QtGui import (
         QPixmap, QPainter, QColor, QBrush, QPen, 
-        QFont, QFontDatabase, QFontMetrics, QPainterPath
+        QFont, QFontDatabase, QFontMetrics, QPainterPath,
+        QRadialGradient
     )
-    from PyQt5.QtCore import (
-        Qt, QThread, pyqtSignal, QTimer, QSize, QPoint, QRectF,
+    from PySide6.QtCore import (
+        Qt, QThread, Signal, QTimer, QSize, QPoint, QRectF,
         QPropertyAnimation, QEasingCurve, QAbstractAnimation
     )
 except ImportError:
-    print("PyQt5 未安装，正在安装...")
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "PyQt5", "-i", "https://pypi.tuna.tsinghua.edu.cn/simple"])
-    from PyQt5.QtWidgets import (
+    print("PySide6 未安装，正在安装 PySide6-Essentials（精简版）...")
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "PySide6-Essentials", "-i", "https://pypi.tuna.tsinghua.edu.cn/simple"])
+    from PySide6.QtWidgets import (
         QApplication, QMainWindow, QWidget, QVBoxLayout, 
         QLabel, QPushButton, QHBoxLayout, QGroupBox, QTextEdit,
-        QDockWidget, QFrame
+        QDockWidget, QFrame, QMenu
     )
-    from PyQt5.QtGui import (
+    from PySide6.QtGui import (
         QPixmap, QPainter, QColor, QBrush, QPen, 
-        QFont, QFontDatabase, QFontMetrics, QPainterPath
+        QFont, QFontDatabase, QFontMetrics, QPainterPath,
+        QRadialGradient
     )
-    from PyQt5.QtCore import (
-        Qt, QThread, pyqtSignal, QTimer, QSize, QPoint, QRectF,
+    from PySide6.QtCore import (
+        Qt, QThread, Signal, QTimer, QSize, QPoint, QRectF,
         QPropertyAnimation, QEasingCurve, QAbstractAnimation
     )
 
@@ -108,7 +110,7 @@ except ImportError:
 # ================================================
 
 # 环境变量设置
-qt_plugin_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'Python', 'Lib', 'site-packages', 'PyQt5', 'Qt5', 'plugins')
+qt_plugin_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'Python', 'Lib', 'site-packages', 'PySide6', 'plugins')
 os.environ['QT_PLUGIN_PATH'] = qt_plugin_path
 
 
@@ -1020,7 +1022,7 @@ class LyricFloatWindow(QWidget):
         print(f"[悬浮歌词] 屏幕分辨率: {screen_width}x{screen_height}, 缩放比例: {scale_factor:.2f}, 调整后字体大小: {adjusted_text_size}px")
         
         # 创建弹簧，将标签推到底部
-        from PyQt5.QtWidgets import QSpacerItem, QSizePolicy
+        from PySide6.QtWidgets import QSpacerItem, QSizePolicy
         spacer = QSpacerItem(0, 0, QSizePolicy.Minimum, QSizePolicy.Expanding)
         layout.addItem(spacer)
         
@@ -1040,11 +1042,13 @@ class LyricFloatWindow(QWidget):
         """)
         
         # 添加文本阴影效果
-        from PyQt5.QtWidgets import QGraphicsDropShadowEffect
-        shadow = QGraphicsDropShadowEffect()
+        from PySide6.QtWidgets import QGraphicsDropShadowEffect
+        from PySide6.QtGui import QColor
+        shadow = QGraphicsDropShadowEffect(self.lyric_label)
         shadow.setBlurRadius(FLOAT_LYRIC_SHADOW_BLUR_RADIUS)
         shadow.setOffset(FLOAT_LYRIC_SHADOW_OFFSET_X, FLOAT_LYRIC_SHADOW_OFFSET_Y)
         shadow.setColor(QColor(0, 0, 0, FLOAT_LYRIC_SHADOW_OPACITY))
+        shadow.setEnabled(True)
         self.lyric_label.setGraphicsEffect(shadow)
         
         layout.addWidget(self.lyric_label)
@@ -1196,7 +1200,7 @@ class LyricFloatWindow(QWidget):
             color_action = color_menu.addAction(color)
             color_action.triggered.connect(lambda checked, c=color: self.change_lyric_color(c))
         
-        menu.exec_(event.globalPos())
+        menu.exec(event.globalPos())
     
     def change_lyric_color(self, color):
         """更改歌词颜色"""
@@ -1326,7 +1330,7 @@ class LyricFloatWindow(QWidget):
         QApplication.processEvents()
         
         # 创建动画
-        from PyQt5.QtCore import QPropertyAnimation, QEasingCurve
+        from PySide6.QtCore import QPropertyAnimation, QEasingCurve
         self.show_animation = QPropertyAnimation(self, b"pos")
         self.show_animation.setDuration(500)  # 增加动画持续时间
         self.show_animation.setEasingCurve(QEasingCurve.OutCubic)  # 缓动曲线
@@ -1357,7 +1361,7 @@ class LyricFloatWindow(QWidget):
             return
         
         # 创建动画
-        from PyQt5.QtCore import QPropertyAnimation, QEasingCurve
+        from PySide6.QtCore import QPropertyAnimation, QEasingCurve
         self.hide_animation = QPropertyAnimation(self, b"pos")
         self.hide_animation.setDuration(500)  # 增加动画持续时间
         self.hide_animation.setEasingCurve(QEasingCurve.InCubic)  # 缓动曲线
@@ -1468,7 +1472,7 @@ class CountdownFloatWindow(QWidget):
             r, g, b = 255, 255, 255
         
         # 创建弹簧，将标签推到底部
-        from PyQt5.QtWidgets import QSpacerItem, QSizePolicy
+        from PySide6.QtWidgets import QSpacerItem, QSizePolicy
         spacer = QSpacerItem(0, 0, QSizePolicy.Minimum, QSizePolicy.Expanding)
         layout.addItem(spacer)
         
@@ -1493,11 +1497,13 @@ class CountdownFloatWindow(QWidget):
         ))
         
         # 添加文本阴影效果
-        from PyQt5.QtWidgets import QGraphicsDropShadowEffect
-        shadow = QGraphicsDropShadowEffect()
+        from PySide6.QtWidgets import QGraphicsDropShadowEffect
+        from PySide6.QtGui import QColor
+        shadow = QGraphicsDropShadowEffect(self.countdown_label)
         shadow.setBlurRadius(FLOAT_LYRIC_SHADOW_BLUR_RADIUS)
         shadow.setOffset(FLOAT_LYRIC_SHADOW_OFFSET_X, FLOAT_LYRIC_SHADOW_OFFSET_Y)
         shadow.setColor(QColor(0, 0, 0, FLOAT_LYRIC_SHADOW_OPACITY))
+        shadow.setEnabled(True)
         self.countdown_label.setGraphicsEffect(shadow)
         
         layout.addWidget(self.countdown_label)
@@ -1555,7 +1561,7 @@ class CountdownFloatWindow(QWidget):
         QApplication.processEvents()
         
         # 创建动画
-        from PyQt5.QtCore import QPropertyAnimation, QEasingCurve
+        from PySide6.QtCore import QPropertyAnimation, QEasingCurve
         self.show_animation = QPropertyAnimation(self, b"pos")
         self.show_animation.setDuration(500)
         self.show_animation.setEasingCurve(QEasingCurve.OutCubic)
@@ -1586,7 +1592,7 @@ class CountdownFloatWindow(QWidget):
             return
         
         # 创建动画
-        from PyQt5.QtCore import QPropertyAnimation, QEasingCurve
+        from PySide6.QtCore import QPropertyAnimation, QEasingCurve
         self.hide_animation = QPropertyAnimation(self, b"pos")
         self.hide_animation.setDuration(500)
         self.hide_animation.setEasingCurve(QEasingCurve.InCubic)
@@ -1605,6 +1611,40 @@ class CountdownFloatWindow(QWidget):
         
         # 启动动画
         self.hide_animation.start()
+
+def _parse_lyric_for_validation(lyric):
+    """
+    解析歌词用于验证（不输出调试信息）
+    :param lyric: 原始歌词
+    :return: 解析后的歌词列表
+    """
+    import re
+    lyric_groups = {}
+    lines = lyric.split('\n')
+    
+    for line in lines:
+        line = line.strip()
+        if not line:
+            continue
+        match = re.match(r'\[(\d+):(\d+)(?:\.(\d+))?\](.*)', line)
+        if match:
+            minutes = int(match.group(1))
+            seconds = int(match.group(2))
+            milliseconds = int(match.group(3)) if match.group(3) else 0
+            total_seconds = round(minutes * 60 + seconds + milliseconds / 1000, 3)
+            content = match.group(4).strip()
+            # 忽略所有0.0秒的歌词
+            if total_seconds == 0.0:
+                continue
+            if total_seconds in lyric_groups:
+                if content:
+                    lyric_groups[total_seconds] += ' / ' + content
+            else:
+                lyric_groups[total_seconds] = content
+    
+    parsed_lyric = [(time, content) for time, content in lyric_groups.items()]
+    parsed_lyric.sort(key=lambda x: x[0])
+    return parsed_lyric
 
 # 整合ultimate_lyric_getter.py中的get_lyric函数
 def get_lyric(artist_name, track_name, file_path=""):
@@ -1629,6 +1669,13 @@ def get_lyric(artist_name, track_name, file_path=""):
             file_path = search_audio_file(artist_name, track_name)
             if file_path:
                 print(f"[歌词搜索过程] 找到音频文件: {file_path}")
+                # 检查文件名是否匹配当前歌曲 - 必须包含歌曲名
+                file_basename = os.path.splitext(os.path.basename(file_path))[0].lower()
+                track_name_lower = track_name.lower()
+                # 必须包含歌曲名才能使用内嵌歌词（仅匹配歌手名不够，同一歌手可能有多个歌曲）
+                if track_name_lower not in file_basename:
+                    print(f"[歌词搜索过程] 警告：找到的音频文件 '{file_path}' 文件名不包含歌曲名 '{track_name}'，跳过内嵌歌词")
+                    file_path = None
             else:
                 print("[歌词搜索过程] 未找到音频文件")
         
@@ -1636,7 +1683,16 @@ def get_lyric(artist_name, track_name, file_path=""):
             embedded_lyric = get_embedded_lyric(file_path)
             if embedded_lyric:
                 print("[歌词搜索过程] 成功获取音频文件内嵌歌词")
-                return embedded_lyric
+                # 验证内嵌歌词是否匹配当前歌曲 - 必须包含歌曲名
+                lyric_lower = embedded_lyric.lower()
+                track_name_lower = track_name.lower()
+                # 必须检查歌词中是否包含歌曲名（仅匹配歌手名不够，很多歌词都会包含歌手名）
+                has_track_match = track_name_lower in lyric_lower
+                if has_track_match:
+                    print("[歌词搜索过程] 内嵌歌词与当前歌曲匹配，使用内嵌歌词")
+                    return embedded_lyric
+                else:
+                    print(f"[歌词搜索过程] 警告：内嵌歌词不包含歌曲名 '{track_name}'，尝试其他来源")
             else:
                 print("[歌词搜索过程] 未找到内嵌歌词")
     else:
@@ -1690,14 +1746,47 @@ def get_lyric(artist_name, track_name, file_path=""):
                 if not filtered_results:
                     filtered_results = results
                 
-                # 显示全部候选歌词列表
-                print("[歌词搜索过程] 候选歌词列表:")
-                for i, result in enumerate(filtered_results):
-                    print(f"[歌词搜索过程] 候选 {i+1}: {result['title']} - {result['artist']} ({result['source']})")
+                # 计算匹配分数并排序
+                target_artist_lower = artist_name.lower()
+                target_title_lower = track_name.lower()
                 
-                # 按顺序尝试获取歌词
-                for i, result in enumerate(filtered_results):
-                    print(f"[歌词搜索过程] 选择第 {i+1} 个结果: {result['title']} - {result['artist']} ({result['source']})")
+                scored_results = []
+                for result in filtered_results:
+                    score = 0
+                    result_artist_lower = result['artist'].lower()
+                    result_title_lower = result['title'].lower()
+                    
+                    # 标题完全匹配
+                    if target_title_lower == result_title_lower:
+                        score += 100
+                    # 标题包含
+                    elif target_title_lower in result_title_lower:
+                        score += 50
+                    
+                    # 歌手完全匹配
+                    if target_artist_lower == result_artist_lower:
+                        score += 100
+                    # 歌手包含
+                    elif target_artist_lower in result_artist_lower:
+                        score += 50
+                    
+                    # 平台加分（网易云有翻译潜力）
+                    if result['source'] == '网易云':
+                        score += 10
+                    
+                    scored_results.append((score, result))
+                
+                # 按分数排序，分数高的优先
+                scored_results.sort(reverse=True, key=lambda x: x[0])
+                
+                # 显示全部结果及匹配分数
+                print("[歌词搜索过程] 找到 {} 个可能的结果，显示全部:".format(len(scored_results)))
+                for i, (score, result) in enumerate(scored_results):
+                    print(f"[歌词搜索过程] {i+1}. {result['artist']} - {result['title']} ({result['source']}) (匹配分数: {score})")
+                
+                # 按排序顺序尝试获取歌词
+                for i, (score, result) in enumerate(scored_results):
+                    print(f"[歌词搜索过程] 选择: {result['artist']} - {result['title']} ({result['source']}) (匹配分数: {score})")
                     
                     # 获取歌词
                     if result['source'] == '网易云':
@@ -1707,9 +1796,15 @@ def get_lyric(artist_name, track_name, file_path=""):
                     
                     if lyric and lyric != '暂无歌词':
                         print("[歌词搜索过程] 成功获取联网歌词")
-                        return lyric
+                        # 验证歌词是否能解析出有效的内容
+                        parsed_lyric = _parse_lyric_for_validation(lyric)
+                        if len(parsed_lyric) > 0:
+                            print(f"[歌词搜索过程] 歌词验证通过，共 {len(parsed_lyric)} 句")
+                            return lyric
+                        else:
+                            print(f"[歌词搜索过程] 警告：歌词解析为空，尝试下一个结果")
                     else:
-                        print(f"[歌词搜索过程] 第 {i+1} 个结果未找到歌词，尝试下一个")
+                        print(f"[歌词搜索过程] 该结果未找到歌词，尝试下一个")
                 
                 print("[歌词搜索过程] 所有结果都未找到歌词")
             else:
@@ -1724,7 +1819,7 @@ def get_lyric(artist_name, track_name, file_path=""):
 
 class AudioCaptureThread(QThread):
     """音频捕获线程 - 用于真实音频可视化"""
-    audio_data_signal = pyqtSignal(np.ndarray)  # 发送音频数据数组
+    audio_data_signal = Signal(np.ndarray)  # 发送音频数据数组
     
     def __init__(self):
         super().__init__()
@@ -1821,7 +1916,7 @@ class AudioCaptureThread(QThread):
 
 class MediaInfoThread(QThread):
     """媒体信息获取线程"""
-    media_info_signal = pyqtSignal(str, object)  # 第二个参数可以是字节数组或None
+    media_info_signal = Signal(str, object)  # 第二个参数可以是字节数组或None
     
     def run(self):
         """运行媒体信息获取"""
@@ -2040,8 +2135,8 @@ class MediaInfoThread(QThread):
 
 class DynamicIslandWidget(QWidget):
     """灵动岛模式UI组件"""
-    # 添加信号，用于在主线程中更新歌词
-    update_lyric_signal = pyqtSignal(str)
+    # 添加信号，用于在主线程中更新歌词，传递歌词内容和歌曲唯一标识
+    update_lyric_signal = Signal(str, str)
     
     def __init__(self):
         super().__init__()
@@ -2089,7 +2184,7 @@ class DynamicIslandWidget(QWidget):
         
         # 用于平滑过渡的额外属性
         self.last_progress_seconds = 0  # 上一次的进度秒数
-        from PyQt5.QtCore import QDateTime
+        from PySide6.QtCore import QDateTime
         self.last_rotation_update_time = QDateTime.currentMSecsSinceEpoch()  # 上一次更新旋转的时间（初始化为当前时间）
         self.estimated_total_seconds = 0  # 估计的总时长秒数
         
@@ -2184,39 +2279,46 @@ class DynamicIslandWidget(QWidget):
         # 设置固定大小，适合三段式布局 - 调整为350x65
         self.setFixedSize(350, 65)
         
-        # 创建主布局 - 左中右三段式
-        self.main_layout = QHBoxLayout(self)
-        self.main_layout.setContentsMargins(10, 10, 10, 10)
-        self.main_layout.setSpacing(10)  # 减小左中右三个部分之间的间距
+        # 创建外层垂直布局，用于垂直居中
+        self.outer_layout = QVBoxLayout(self)
+        self.outer_layout.setContentsMargins(2, 2, 2, 2)  # 四周保持2像素间隔
+        self.outer_layout.setSpacing(0)
+        
+        # 创建内层水平布局 - 左中右三段式
+        self.main_layout = QHBoxLayout()
+        self.main_layout.setContentsMargins(0, 0, 0, 0)  # 无边距，让专辑图和可视化贴紧外层布局边缘（外层已有2px边距）
+        self.main_layout.setSpacing(10)  # 三个部分之间的间距
+        
+        # 将水平布局添加到垂直布局中（自动垂直居中）
+        self.outer_layout.addLayout(self.main_layout)
         
         # 左侧：专辑图 - 创建一个自定义的圆形专辑图控件
         self.left_section = QWidget(self)
-        self.left_section.setFixedSize(45, 45)
+        self.left_section.setFixedSize(55, 55)
         
         # 创建一个空白的QPixmap作为初始专辑图
-        initial_pixmap = QPixmap(45, 45)
+        initial_pixmap = QPixmap(55, 55)
         initial_pixmap.fill(Qt.transparent)
         painter = QPainter(initial_pixmap)
-        painter.setRenderHint(QPainter.Antialiasing)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
         painter.setRenderHint(QPainter.SmoothPixmapTransform)
-        painter.setRenderHint(QPainter.HighQualityAntialiasing)
         
         # 绘制初始的圆形背景
         painter.setBrush(QColor(51, 51, 51))
         painter.setPen(Qt.NoPen)
-        painter.drawEllipse(QRectF(0, 0, 45, 45))
+        painter.drawEllipse(QRectF(0, 0, 55, 55))
         
         # 绘制音乐图标
         font = painter.font()
         font.setPointSize(20)
         painter.setFont(font)
         painter.setPen(QColor(255, 255, 255))
-        painter.drawText(QRectF(0, 0, 45, 45), Qt.AlignCenter, "🎵")
+        painter.drawText(QRectF(0, 0, 55, 55), Qt.AlignCenter, "🎵")
         painter.end()
         
         # 创建最终的专辑图标签
         self.album_art = QLabel(self.left_section)
-        self.album_art.setGeometry(0, 0, 45, 45)
+        self.album_art.setGeometry(0, 0, 55, 55)
         self.album_art.setAlignment(Qt.AlignCenter)
         # 设置鼠标指针为手型，提示可点击
         self.album_art.setCursor(Qt.PointingHandCursor)
@@ -2227,16 +2329,15 @@ class DynamicIslandWidget(QWidget):
         
         # 应用高质量的圆形遮罩
         # 创建一个高质量的圆形遮罩
-        mask_pixmap = QPixmap(45, 45)
+        mask_pixmap = QPixmap(55, 55)
         mask_pixmap.fill(Qt.transparent)
         mask_painter = QPainter(mask_pixmap)
-        mask_painter.setRenderHint(QPainter.Antialiasing, True)
-        mask_painter.setRenderHint(QPainter.HighQualityAntialiasing, True)
+        mask_painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
         
         # 绘制一个抗锯齿的白色圆形
         mask_painter.setBrush(QColor(255, 255, 255))
         mask_painter.setPen(Qt.NoPen)
-        mask_painter.drawEllipse(QRectF(0.5, 0.5, 44, 44))  # 微调位置，避免锯齿
+        mask_painter.drawEllipse(QRectF(0.5, 0.5, 54, 54))  # 微调位置，避免锯齿
         mask_painter.end()
         
         # 应用遮罩
@@ -2245,68 +2346,68 @@ class DynamicIslandWidget(QWidget):
         
         # 中间：使用绝对定位，让元素可以重叠显示
         self.middle_section = QWidget(self)
-        self.middle_section.setFixedSize(180, 45)  # 设置固定大小，确保有足够空间显示所有元素
+        self.middle_section.setFixedSize(180, 55)  # 设置固定大小，确保有足够空间显示所有元素
         
-        # 1. 歌曲名 - 独立模块，向上移动以避开歌手名
+        # 1. 歌曲名 - 独立模块，占40%高度 (55 * 0.4 = 22px)
         self.song_label = QLabel(self.middle_section)
-        self.song_label.setStyleSheet("QLabel { color: rgba(255, 255, 255, 0.3); font-family: 'Microsoft YaHei UI', 'Segoe UI', sans-serif; font-size: 12px; font-weight: bold; background: transparent; letter-spacing: 0.3px; border: none; }")
+        self.song_label.setStyleSheet("QLabel { color: rgba(255, 255, 255, 0.3); font-family: 'Microsoft YaHei UI', 'Segoe UI', sans-serif; font-size: 14px; font-weight: 900; background: transparent; letter-spacing: 0.3px; border: none; }")
         self.song_label.setText("- 歌曲 - ")
         self.song_label.setAlignment(Qt.AlignCenter)
-        self.song_label.setFixedSize(180, 15)  # 固定高度，确保完整显示
-        self.song_label.move(0, 0)  # 绝对定位，距离顶部0px，向上移动5px
+        self.song_label.setFixedSize(180, 22)  # 40%高度
+        self.song_label.move(0, 0)  # 从顶部开始
         # 设置鼠标指针为手型，提示可双击
         self.song_label.setCursor(Qt.PointingHandCursor)
         # 添加双击事件处理
         self.song_label.mouseDoubleClickEvent = self.toggle_float_lyric_window
         
-        # 2. 歌手名 - 独立模块，调整位置与歌曲名形成适当间距
+        # 2. 歌手名 - 独立模块，占30%高度 (55 * 0.3 = 17px)
         self.artist_label = QLabel(self.middle_section)
-        self.artist_label.setStyleSheet("QLabel { color: rgba(255, 255, 255, 0.25); font-family: 'Microsoft YaHei UI', 'Segoe UI', sans-serif; font-size: 10px; font-weight: bold; background: transparent; letter-spacing: 0.2px; border: none; }")
+        self.artist_label.setStyleSheet("QLabel { color: rgba(255, 255, 255, 0.25); font-family: 'Microsoft YaHei UI', 'Segoe UI', sans-serif; font-size: 11px; font-weight: bold; background: transparent; letter-spacing: 0.2px; border: none; }")
         self.artist_label.setText("- 歌手 - ")
         self.artist_label.setAlignment(Qt.AlignCenter)
-        self.artist_label.setFixedSize(180, 15)  # 固定高度，确保完整显示
-        self.artist_label.move(0, 12)  # 绝对定位，距离顶部12px，与歌曲名保持3px间距
+        self.artist_label.setFixedSize(180, 17)  # 30%高度
+        self.artist_label.move(0, 22)  # 紧跟歌曲名下方
         # 设置鼠标指针为手型，提示可双击
         self.artist_label.setCursor(Qt.PointingHandCursor)
         # 添加双击事件处理
         self.artist_label.mouseDoubleClickEvent = self.toggle_float_lyric_window
         
-        # 3. 播放控件 - 独立模块，允许与歌手名重叠
+        # 3. 播放控件 - 独立模块，占20%高度 (55 * 0.2 = 11px)
         # 上一曲按钮
         self.prev_button = QPushButton("◀◀", self.middle_section)
         self.prev_button.setStyleSheet(
-            "QPushButton { color: rgba(255, 255, 255, 0.1); background: transparent; border: none; font-size: 14px; font-weight: bold; outline: none; }"
+            "QPushButton { color: rgba(255, 255, 255, 0.1); background: transparent; border: none; font-size: 12px; font-weight: bold; outline: none; }"
             "QPushButton:hover { color: rgba(255, 255, 255, 0.1); background: transparent; border: none; font-weight: bold; outline: none; }"
             "QPushButton:focus { color: rgba(255, 255, 255, 0.1); background: transparent; border: none; font-weight: bold; outline: none; }"
             "QPushButton:pressed { color: rgba(255, 255, 255, 0.1); background: transparent; border: none; font-weight: bold; outline: none; }"
         )
         self.prev_button.clicked.connect(self.prev_track)
-        self.prev_button.setFixedSize(25, 25)
-        self.prev_button.move(50, 25)  # 绝对定位，距离左侧50px，顶部25px
+        self.prev_button.setFixedSize(20, 11)  # 缩小按钮尺寸
         
         # 播放/暂停按钮
         self.play_pause_button = QPushButton("▶", self.middle_section)
         self.play_pause_button.setStyleSheet(
-            "QPushButton { color: rgba(255, 255, 255, 0.1); background: transparent; border: none; font-size: 16px; font-weight: bold; outline: none; }"
-            "QPushButton:hover { color: rgba(255, 255, 255, 0.1); background: transparent; border: none; font-weight: bold; outline: none; }"
-            "QPushButton:focus { color: rgba(255, 255, 255, 0.1); background: transparent; border: none; font-weight: bold; outline: none; }"
-            "QPushButton:pressed { color: rgba(255, 255, 255, 0.1); background: transparent; border: none; font-weight: bold; outline: none; }"
-        )
-        self.play_pause_button.clicked.connect(self.play_pause)
-        self.play_pause_button.setFixedSize(25, 25)
-        self.play_pause_button.move(80, 25)  # 绝对定位，距离左侧80px，顶部25px
-        
-        # 下一曲按钮
-        self.next_button = QPushButton("▶▶", self.middle_section)
-        self.next_button.setStyleSheet(
             "QPushButton { color: rgba(255, 255, 255, 0.1); background: transparent; border: none; font-size: 14px; font-weight: bold; outline: none; }"
             "QPushButton:hover { color: rgba(255, 255, 255, 0.1); background: transparent; border: none; font-weight: bold; outline: none; }"
             "QPushButton:focus { color: rgba(255, 255, 255, 0.1); background: transparent; border: none; font-weight: bold; outline: none; }"
             "QPushButton:pressed { color: rgba(255, 255, 255, 0.1); background: transparent; border: none; font-weight: bold; outline: none; }"
         )
+        self.play_pause_button.clicked.connect(self.play_pause)
+        self.play_pause_button.setFixedSize(20, 11)  # 缩小按钮尺寸
+        
+        # 下一曲按钮
+        self.next_button = QPushButton("▶▶", self.middle_section)
+        self.next_button.setStyleSheet(
+            "QPushButton { color: rgba(255, 255, 255, 0.1); background: transparent; border: none; font-size: 12px; font-weight: bold; outline: none; }"
+            "QPushButton:hover { color: rgba(255, 255, 255, 0.1); background: transparent; border: none; font-weight: bold; outline: none; }"
+            "QPushButton:focus { color: rgba(255, 255, 255, 0.1); background: transparent; border: none; font-weight: bold; outline: none; }"
+            "QPushButton:pressed { color: rgba(255, 255, 255, 0.1); background: transparent; border: none; font-weight: bold; outline: none; }"
+        )
         self.next_button.clicked.connect(self.next_track)
-        self.next_button.setFixedSize(25, 25)
-        self.next_button.move(110, 25)  # 绝对定位，距离左侧110px，顶部25px
+        self.next_button.setFixedSize(20, 11)  # 缩小按钮尺寸
+        
+        # 计算播放控件居中位置
+        self.update_play_controls_position()
         
         # 初始化滚动定时器
         self.song_scroll_timer.setInterval(self.song_scroll_interval)
@@ -2314,28 +2415,48 @@ class DynamicIslandWidget(QWidget):
         
         self.main_layout.addWidget(self.middle_section, 1)
         
-        # 右侧：音频可视化
+        # 右侧：音频可视化（与专辑图同尺寸）
         self.right_section = QWidget(self)
-        self.right_section.setFixedSize(55, 45)
+        self.right_section.setFixedSize(55, 55)  # 与专辑图相同大小
         # 设置鼠标指针为手型，提示可点击
         self.right_section.setCursor(Qt.PointingHandCursor)
         # 添加点击事件处理
         self.right_section.mousePressEvent = self.toggle_visualization_style
         
         self.visualization_layout = QHBoxLayout(self.right_section)
-        self.visualization_layout.setContentsMargins(8, 5, 8, 5)
-        self.visualization_layout.setSpacing(2)  # 减小间距
+        self.visualization_layout.setContentsMargins(2, 2, 2, 2)  # 上下左右都是2px边距
+        self.visualization_layout.setSpacing(3)  # 调整间距
         
-        # 创建可视化条 - 5个，缩小宽度
+        # 创建可视化条 - 4个，调整尺寸适应55px宽度（2px边距）
         self.visualization_bars = []
-        for i in range(5):
+        for i in range(4):
             bar = QWidget(self.right_section)
-            bar.setFixedSize(6, 10)  # 缩小宽度为6像素
+            bar.setFixedSize(10, 15)  # 增大尺寸以利用减小的边距空间
             bar.setStyleSheet("QWidget { background-color: #4CAF50; border-radius: 2px; }")
             self.visualization_bars.append(bar)
             self.visualization_layout.addWidget(bar)
         
         self.main_layout.addWidget(self.right_section)
+    
+    def update_play_controls_position(self):
+        """计算并更新播放控件的居中位置"""
+        # 中间区域宽度
+        middle_width = self.middle_section.width()
+        # 播放控件区域高度位置（歌曲名22px + 歌手名17px）
+        control_y = 39
+        
+        # 三个按钮总宽度（每个20px，间距7px）
+        button_width = 20
+        button_gap = 7
+        total_width = button_width * 3 + button_gap * 2
+        
+        # 计算居中起始位置
+        start_x = (middle_width - total_width) // 2
+        
+        # 设置按钮位置
+        self.prev_button.move(start_x, control_y)
+        self.play_pause_button.move(start_x + button_width + button_gap, control_y)
+        self.next_button.move(start_x + button_width * 2 + button_gap * 2, control_y)
     
     def init_animations(self):
         """初始化动画对象"""
@@ -2355,6 +2476,11 @@ class DynamicIslandWidget(QWidget):
         if not self.is_visible:
             self.is_visible = True
             
+            # 如果有缓存的专辑图数据，确保 original_album_art 存在
+            if self.last_album_art_bytes and (self.original_album_art is None or self.original_album_art.isNull()):
+                self.original_album_art = QPixmap()
+                self.original_album_art.loadFromData(self.last_album_art_bytes)
+            
             # 设置动画起始和结束位置
             start_pos = self.pos()
             end_pos = QPoint(start_pos.x(), self.initial_y)
@@ -2368,6 +2494,8 @@ class DynamicIslandWidget(QWidget):
             
             # 显示窗口并启动动画
             self.show()
+            # 重新绘制专辑图，确保显示时专辑图不会丢失
+            self.draw_rotated_album_art()
             self.enter_animation.start()
     
     def hide_with_animation(self):
@@ -2397,6 +2525,17 @@ class DynamicIslandWidget(QWidget):
     def is_fullscreen_or_maximized(self):
         """检查当前是否有全屏或最大化应用，并返回导致全屏的窗口信息"""
         try:
+            from PySide6.QtWidgets import QApplication
+            
+            def get_screen_size():
+                """使用 PySide6 获取正确的屏幕尺寸（考虑系统缩放）"""
+                screen = QApplication.primaryScreen()
+                if screen:
+                    geometry = screen.availableGeometry()
+                    return geometry.width(), geometry.height()
+                # 回退到 GetSystemMetrics
+                return user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
+            
             # 获取当前焦点窗口
             foreground_hwnd = user32.GetForegroundWindow()
             
@@ -2429,9 +2568,8 @@ class DynamicIslandWidget(QWidget):
                         rect = RECT()
                         user32.GetWindowRect(foreground_hwnd, ctypes.byref(rect))
                         
-                        # 获取屏幕尺寸
-                        screen_width = user32.GetSystemMetrics(0)  # SM_CXSCREEN
-                        screen_height = user32.GetSystemMetrics(1)  # SM_CYSCREEN
+                        # 获取屏幕尺寸（使用 PySide6 获取正确的屏幕尺寸，考虑系统缩放）
+                        screen_width, screen_height = get_screen_size()
                         
                         # 计算窗口尺寸
                         window_width = rect.right - rect.left
@@ -2463,9 +2601,8 @@ class DynamicIslandWidget(QWidget):
                 rect = RECT()
                 user32.GetWindowRect(parent_hwnd, ctypes.byref(rect))
                 
-                # 获取屏幕尺寸
-                screen_width = user32.GetSystemMetrics(0)  # SM_CXSCREEN
-                screen_height = user32.GetSystemMetrics(1)  # SM_CYSCREEN
+                # 获取屏幕尺寸（使用 PySide6 获取正确的屏幕尺寸，考虑系统缩放）
+                screen_width, screen_height = get_screen_size()
                 
                 # 计算窗口尺寸
                 window_width = rect.right - rect.left
@@ -2578,7 +2715,7 @@ class DynamicIslandWidget(QWidget):
 
     def on_album_art_clicked(self, event):
         """专辑图点击事件处理"""
-        from PyQt5.QtCore import QDateTime
+        from PySide6.QtCore import QDateTime
         current_time = QDateTime.currentMSecsSinceEpoch()
         
         # 检测双击
@@ -2643,7 +2780,7 @@ class DynamicIslandWidget(QWidget):
             self.float_lyric_window_visible = False
             
             # 延迟显示倒计时窗口，确保悬浮歌词隐藏动画完成
-            from PyQt5.QtCore import QTimer
+            from PySide6.QtCore import QTimer
             QTimer.singleShot(600, self.show_countdown_window)
         else:
             # 如果没有悬浮歌词或已隐藏，直接显示倒计时窗口
@@ -2728,7 +2865,7 @@ class DynamicIslandWidget(QWidget):
                 float_lyric_window.hide_with_animation()
                 
                 # 等待动画对象创建后再连接信号
-                from PyQt5.QtCore import QTimer
+                from PySide6.QtCore import QTimer
                 QTimer.singleShot(10, lambda: float_lyric_window.hide_animation.finished.connect(on_hide_finished) if float_lyric_window.hide_animation else on_hide_finished())
             
             # 直接修改代码文件中的FLOAT_LYRIC_ENABLED值，保存状态
@@ -2822,10 +2959,9 @@ class DynamicIslandWidget(QWidget):
         """绘制圆角胶囊形状"""
         painter = QPainter(self)
         # 添加抗锯齿和高质量渲染设置
-        painter.setRenderHint(QPainter.Antialiasing)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
         painter.setRenderHint(QPainter.TextAntialiasing)
         painter.setRenderHint(QPainter.SmoothPixmapTransform)
-        painter.setRenderHint(QPainter.HighQualityAntialiasing)
         
         # 绘制黑色半透明背景
         brush = QBrush(QColor(30, 30, 30, 230))
@@ -3188,7 +3324,7 @@ class DynamicIslandWidget(QWidget):
                             current_seconds = parse_time(current_progress)
                             total_seconds = parse_time(total_duration)
                             
-                            from PyQt5.QtCore import QDateTime
+                            from PySide6.QtCore import QDateTime
                             
                             # 更新状态信息，确保后续旋转计算正确
                             self.last_progress_seconds = current_seconds
@@ -3200,9 +3336,9 @@ class DynamicIslandWidget(QWidget):
                             self.is_adjusting_time = False
                             
             # 优化歌曲名和歌手名的解析
-            def optimize_song_info(artist, song):
+            def optimize_song_info_for_search(artist, song):
                 """
-                优化歌曲名和歌手名的解析
+                优化歌曲名和歌手名用于歌词搜索（去除干扰信息）
                 :param artist: 原始歌手名
                 :param song: 原始歌曲名
                 :return: (优化后的歌手名, 优化后的歌曲名)
@@ -3210,10 +3346,13 @@ class DynamicIslandWidget(QWidget):
                 import os
                 import re
                 
-                # 1. 移除文件扩展名
-                song = os.path.splitext(song)[0]
+                # 1. 只移除视频文件扩展名（而不是所有扩展名）
+                video_extensions = ['.mkv', '.mp4', '.avi', '.mov', '.wmv', '.flv', '.webm']
+                ext = os.path.splitext(song)[1].lower()
+                if ext in video_extensions:
+                    song = os.path.splitext(song)[0]
                 
-                # 2. 移除所有括号内容（包括括号本身）
+                # 2. 移除所有括号内容（包括括号本身），防止干扰搜索
                 song = re.sub(r'\([^)]*\)', '', song)
                 song = re.sub(r'\[[^\]]*\]', '', song)
                 
@@ -3240,26 +3379,46 @@ class DynamicIslandWidget(QWidget):
                 
                 return artist, song
             
+            def optimize_song_info_for_display(artist, song):
+                """
+                优化歌曲名和歌手名用于显示（只去除视频文件后缀）
+                :param artist: 原始歌手名
+                :param song: 原始歌曲名
+                :return: (优化后的歌手名, 优化后的歌曲名)
+                """
+                import os
+                
+                # 1. 只移除视频文件扩展名
+                video_extensions = ['.mkv', '.mp4', '.avi', '.mov', '.wmv', '.flv', '.webm']
+                ext = os.path.splitext(song)[1].lower()
+                if ext in video_extensions:
+                    song = os.path.splitext(song)[0]
+                
+                return artist, song
+            
             # 保存原始歌曲名（包含视频后缀）
             song_name_original = song_name
             
-            # 应用优化
-            artist_name, song_name = optimize_song_info(artist_name, song_name)
+            # 分别处理：一个用于显示，一个用于搜索
+            artist_name_display, song_name_display = optimize_song_info_for_display(artist_name, song_name)
+            artist_name_search, song_name_search = optimize_song_info_for_search(artist_name, song_name)
             
-            # 检测是否为新歌曲
-            is_new_song = song_name != self.current_song or artist_name != self.current_artist
+            # 检测是否为新歌曲（使用显示版本判断）
+            is_new_song = song_name_display != self.current_song or artist_name_display != self.current_artist
             
             # 只在信息发生变化时输出日志
             if is_new_song:
                 try:
-                    print(f"优化后的媒体信息：歌曲名='{song_name}', 歌手名='{artist_name}'")
-                    print(f"解析到的媒体信息：歌曲名='{song_name}', 歌手名='{artist_name}'")
+                    print(f"优化后的媒体信息（显示）：歌曲名='{song_name_display}', 歌手名='{artist_name_display}'")
+                    print(f"优化后的媒体信息（搜索）：歌曲名='{song_name_search}', 歌手名='{artist_name_search}'")
+                    print(f"解析到的媒体信息：歌曲名='{song_name_display}', 歌手名='{artist_name_display}'")
                 except UnicodeEncodeError:
                     # 处理Unicode编码错误，使用replace模式
-                    print("优化后的媒体信息：歌曲名='{}', 歌手名='{}".format(song_name.encode('utf-8', 'replace').decode('utf-8'), artist_name.encode('utf-8', 'replace').decode('utf-8')))
+                    print("优化后的媒体信息（显示）：歌曲名='{}', 歌手名='{}".format(song_name_display.encode('utf-8', 'replace').decode('utf-8'), artist_name_display.encode('utf-8', 'replace').decode('utf-8')))
+                    print("优化后的媒体信息（搜索）：歌曲名='{}', 歌手名='{}".format(song_name_search.encode('utf-8', 'replace').decode('utf-8'), artist_name_search.encode('utf-8', 'replace').decode('utf-8')))
                     print("解析到的媒体信息：歌曲名='{}', 歌手名='{}".format(
-                        song_name.encode('utf-8', 'replace').decode('utf-8'),
-                        artist_name.encode('utf-8', 'replace').decode('utf-8')
+                        song_name_display.encode('utf-8', 'replace').decode('utf-8'),
+                        artist_name_display.encode('utf-8', 'replace').decode('utf-8')
                     ))
             
             # 更新歌词显示，但在新歌曲情况下延迟更新，确保消失动画正常播放
@@ -3411,11 +3570,17 @@ class DynamicIslandWidget(QWidget):
                 # 重置进度秒数，避免显示上一首歌曲0.00秒的歌词
                 self.last_progress_seconds = 0.0
             
-            # 新歌曲，更新当前歌曲名和歌手名
-            self.current_song = song_name
-            self.current_artist = artist_name
+            # 新歌曲，更新当前歌曲名和歌手名（使用显示版本）
+            self.current_song = song_name_display
+            self.current_artist = artist_name_display
             # 重置倒计时秒数，确保新歌曲的倒计时日志能够正确显示
             self.last_countdown_second = -1
+            
+            # 清空歌词缓存，确保每次切换歌曲都重新获取歌词
+            self.lyric_cache.clear()
+            self.parsed_lyric_cache.clear()
+            self.lyric_fetch_count.clear()
+            print("[歌词] 已清空歌词缓存，准备重新获取歌词")
             
             # 重置专辑图相关属性
             self.rotation_angle = 0
@@ -3436,7 +3601,7 @@ class DynamicIslandWidget(QWidget):
                 # 悬浮歌词开启，显示原歌手和歌曲名
                 if FLOAT_LYRIC_ENABLED == 1:
                     # 显示原始歌手和歌曲名
-                    display_text = song_name
+                    display_text = song_name_display
                     # 保存原始显示文本
                     self.song_original_text = display_text
                     # 检查是否需要滚动
@@ -3452,10 +3617,10 @@ class DynamicIslandWidget(QWidget):
                         self.song_label.setText(display_text)
                     
                     # 更新歌手名显示为原始歌手名
-                    self.artist_label.setText(artist_name)
+                    self.artist_label.setText(artist_name_display)
                 else:
                     # 悬浮歌词关闭，默认显示歌曲名
-                    display_text = song_name
+                    display_text = song_name_display
                     # 保存原始显示文本
                     self.song_original_text = display_text
                     # 检查是否需要滚动
@@ -3471,42 +3636,30 @@ class DynamicIslandWidget(QWidget):
                         self.song_label.setText(display_text)
                     
                     # 更新歌手名显示
-                    self.artist_label.setText(artist_name)
+                    self.artist_label.setText(artist_name_display)
             
             # 1秒后更新文本
             QTimer.singleShot(1000, update_text_after_animation)
             
-            # 构建歌曲唯一标识
-            song_key = f"{artist_name}-{song_name}"
+            # 构建歌曲唯一标识（使用搜索版本）
+            song_key = f"{artist_name_search}-{song_name_search}"
             
             # 只有当artist_name或song_name不为空时，才尝试获取歌词
-            if artist_name or song_name:
-                # 检查是否已经在缓存中
-                if song_key in self.lyric_cache:
-                    lyric = self.lyric_cache[song_key]
-                    if lyric:
-                        self._update_lyric_display(lyric)
-                else:
-                    # 检查获取次数
-                    fetch_count = self.lyric_fetch_count.get(song_key, 0)
-                    if fetch_count < 3:
-                        # 取消当前等待执行的歌词获取任务
-                        if self.lyric_timer.isActive():
-                            self.lyric_timer.stop()
-                        
-                        # 保存当前任务（包含文件路径和原始歌曲名）
-                        # 传递原始的song_name用于视频文件检测
-                        self.current_lyric_task = (artist_name, song_name, song_key, file_path, song_name_original)
-                        
-                        # 延时2秒后获取歌词
-                        # 断开之前的连接，避免重复连接
-                        try:
-                            self.lyric_timer.timeout.disconnect(self._delayed_fetch_lyric)
-                        except:
-                            pass
-                        self.lyric_timer.timeout.connect(self._delayed_fetch_lyric)
-                        self.lyric_timer.start(2000)  # 2秒后执行
-                        print(f"准备获取歌词：{artist_name} - {song_name}")
+            if artist_name_search or song_name_search:
+                # 检查获取次数
+                fetch_count = self.lyric_fetch_count.get(song_key, 0)
+                if fetch_count < 3:
+                    # 取消当前等待执行的歌词获取任务
+                    if self.lyric_timer.isActive():
+                        self.lyric_timer.stop()
+                    
+                    # 保存当前任务（包含文件路径和原始歌曲名）
+                    # 传递搜索版本的song_name用于搜索
+                    self.current_lyric_task = (artist_name_search, song_name_search, song_key, file_path, song_name_original)
+                    
+                    # 延时2秒后获取歌词
+                    QTimer.singleShot(2000, self._delayed_fetch_lyric)
+                    print(f"准备获取歌词：{artist_name_search} - {song_name_search}")
     
     def _delayed_fetch_lyric(self):
         """
@@ -3587,8 +3740,8 @@ class DynamicIslandWidget(QWidget):
             if lyric:
                 print(f"[歌词] 成功获取歌词：{artist_name} - {song_name}")
                 print(f"[歌词] 歌词长度: {len(lyric)}字符")
-                # 使用信号-槽机制在主线程中更新UI
-                self.update_lyric_signal.emit(lyric)
+                # 使用信号-槽机制在主线程中更新UI，传递song_key确保歌词缓存到正确的歌曲
+                self.update_lyric_signal.emit(lyric, song_key)
             else:
                 print(f"[歌词] 未找到歌词：{artist_name} - {song_name}")
         except Exception as e:
@@ -3948,16 +4101,16 @@ class DynamicIslandWidget(QWidget):
                                 artist_current_style)
         self.artist_label.setStyleSheet(artist_new_style)
     
-    def _update_lyric_display(self, lyric):
+    def _update_lyric_display(self, lyric, song_key=None):
         """
         在主线程中更新歌词显示
         :param lyric: 获取到的歌词
+        :param song_key: 歌曲唯一标识，用于缓存。如果为None，则使用当前歌曲信息构建
         """
-        # 声明全局变量
         global FLOAT_LYRIC_ENABLED
         
-        # 构建歌曲唯一标识
-        song_key = f"{self.current_artist}-{self.current_song}"
+        if song_key is None:
+            song_key = f"{self.current_artist}-{self.current_song}"
         
         # 检查解析后的歌词是否已经在缓存中
         if song_key not in self.parsed_lyric_cache:
@@ -4082,6 +4235,7 @@ class DynamicIslandWidget(QWidget):
     def update_album_art(self, album_art_bytes):
         """
         更新专辑图 - 使用高质量圆形处理
+        支持缓存机制：当无法获取专辑图时，使用缓存的专辑图
         """
         # 检查专辑图是否真正变化
         # 特别处理None和bytearray的比较情况
@@ -4098,8 +4252,12 @@ class DynamicIslandWidget(QWidget):
             # 加载原始图片并保存
             self.original_album_art = QPixmap()
             self.original_album_art.loadFromData(album_art_bytes)
+        elif self.original_album_art and not self.original_album_art.isNull():
+            # 如果无法获取专辑图，但已有缓存的专辑图，则保持使用缓存
+            # 这样在PotPlayer全屏缩小等情况下专辑图不会丢失
+            print("[专辑图] 无法获取专辑图，使用缓存的专辑图")
         else:
-            # 清除原始专辑图
+            # 清除原始专辑图（只有在没有缓存时才清除）
             self.original_album_art = None
         
         # 只有在专辑图真正变化时才重置旋转角度（如切换歌曲或专辑图变化）
@@ -4113,7 +4271,7 @@ class DynamicIslandWidget(QWidget):
     
     def update_smooth_rotation(self):
         """平滑更新旋转角度"""
-        from PyQt5.QtCore import QDateTime
+        from PySide6.QtCore import QDateTime
         
         # 固定速度旋转模式，不需要基于进度计算初始旋转角度
         # 程序刚启动时也直接使用固定速度旋转
@@ -4168,39 +4326,38 @@ class DynamicIslandWidget(QWidget):
     def draw_rotated_album_art(self):
         """根据当前旋转角度绘制专辑图"""
         # 创建一个高质量的圆形专辑图
-        final_pixmap = QPixmap(45, 45)
+        final_pixmap = QPixmap(55, 55)
         final_pixmap.fill(Qt.transparent)
         painter = QPainter(final_pixmap)
         
         # 设置最高质量的渲染提示
-        painter.setRenderHint(QPainter.Antialiasing)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
         painter.setRenderHint(QPainter.SmoothPixmapTransform)
-        painter.setRenderHint(QPainter.HighQualityAntialiasing)
         painter.setRenderHint(QPainter.TextAntialiasing)
         
         # 绘制圆形背景
         painter.setBrush(QColor(51, 51, 51))
         painter.setPen(Qt.NoPen)
-        painter.drawEllipse(QRectF(0, 0, 45, 45))
+        painter.drawEllipse(QRectF(0, 0, 55, 55))
         
         # 裁剪绘制区域为圆形
         circle_path = QPainterPath()
-        circle_path.addEllipse(QRectF(0, 0, 45, 45))
+        circle_path.addEllipse(QRectF(0, 0, 55, 55))
         painter.setClipPath(circle_path)
         
-        if self.original_album_art:
+        if self.original_album_art and not self.original_album_art.isNull():
             # 保存当前坐标系
             painter.save()
             
             # 移动坐标系原点到圆心
-            painter.translate(22.5, 22.5)  # 45/2 = 22.5
+            painter.translate(27.5, 27.5)  # 55/2 = 27.5
             
             # 旋转坐标系
             painter.rotate(self.rotation_angle)
             
             # 高质量缩放专辑图
             scaled_pixmap = self.original_album_art.scaled(
-                45, 45, 
+                55, 55, 
                 Qt.KeepAspectRatio, 
                 Qt.SmoothTransformation
             )
@@ -4220,7 +4377,7 @@ class DynamicIslandWidget(QWidget):
             font.setPointSize(24)
             painter.setFont(font)
             painter.setPen(QColor(200, 200, 200))  # 使用浅灰色，比纯白色更柔和但更明显
-            painter.drawText(QRectF(0, 0, 45, 45), Qt.AlignCenter, "🎵")
+            painter.drawText(QRectF(0, 0, 55, 55), Qt.AlignCenter, "🎵")
         
         painter.end()
         
@@ -4240,7 +4397,7 @@ class DynamicIslandWidget(QWidget):
         metrics = QFontMetrics(font)
         
         # 计算文本宽度
-        self.song_text_width = metrics.width(self.song_original_text)
+        self.song_text_width = metrics.horizontalAdvance(self.song_original_text)
         self.song_display_width = self.song_label.width()
         
         # 判断是否需要滚动
@@ -4587,7 +4744,7 @@ class MediaGUIFromCurrent(QMainWindow):
         self.volume_layout.addWidget(self.volume_icon)
         
         # 音量滑块
-        from PyQt5.QtWidgets import QSlider
+        from PySide6.QtWidgets import QSlider
         self.volume_slider = QSlider(Qt.Horizontal)
         self.volume_slider.setRange(0, 100)
         self.volume_slider.setValue(50)  # 默认值
@@ -4641,8 +4798,8 @@ class MediaGUIFromCurrent(QMainWindow):
         self.current_session = None
         
         # 添加定时器实现实时刷新
-        from PyQt5.QtCore import QTimer
-        self.refresh_timer = QTimer(self)
+        from PySide6.QtCore import QTimer
+        self.refresh_timer = QTimer()
         self.refresh_timer.setInterval(500)  # 每500ms刷新一次，减少延迟
         self.refresh_timer.timeout.connect(self.refresh_media_info)
         self.refresh_timer.start()
@@ -4842,19 +4999,30 @@ class MediaGUIFromCurrent(QMainWindow):
             # 保存当前媒体信息
             self.last_media_info = media_info
         
-        # 更新专辑图显示 - 总是更新，确保从有专辑图到无专辑图的过渡能正确处理
-        if album_art_bytes:
-            # 从字节数组创建QPixmap
+        # 更新专辑图显示 - 只在歌曲变化或专辑图数据变化时更新
+        if song_changed or artist_changed:
+            # 歌曲变化，必须更新专辑图
+            if album_art_bytes:
+                # 从字节数组创建QPixmap
+                pixmap = QPixmap()
+                pixmap.loadFromData(album_art_bytes)
+                # 调整专辑图大小以适应标签
+                pixmap = pixmap.scaled(self.album_art_label.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
+                self.album_art_label.setPixmap(pixmap)
+                self.album_art_label.setText("")
+            else:
+                self.album_art_label.setText("暂无专辑图")
+            # 更新缓存
+            self.last_album_art_bytes = album_art_bytes
+        elif album_art_changed and album_art_bytes:
+            # 专辑图数据变化（非None），也更新
             pixmap = QPixmap()
             pixmap.loadFromData(album_art_bytes)
-            # 调整专辑图大小以适应标签
             pixmap = pixmap.scaled(self.album_art_label.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
             self.album_art_label.setPixmap(pixmap)
             self.album_art_label.setText("")
-        else:
-            self.album_art_label.setText("暂无专辑图")
-        # 更新缓存
-        self.last_album_art_bytes = album_art_bytes
+            self.last_album_art_bytes = album_art_bytes
+        # 其他情况：同一首歌，没有专辑图数据时，保持使用之前的缓存不更新
         
         # 移除自动更新音量滑块，避免覆盖用户手动调整
         # 音量滑块只在初始化和用户调整时更新
@@ -4862,8 +5030,10 @@ class MediaGUIFromCurrent(QMainWindow):
         # 更新灵动岛信息
         if self.is_dynamic_island_mode:
             self.dynamic_island.update_media_info(media_info)
-            # 总是更新灵动岛的专辑图，确保从有专辑图到无专辑图的过渡能正确处理
-            self.dynamic_island.update_album_art(album_art_bytes)
+            # 只在歌曲变化或专辑图数据变化时才更新专辑图
+            if song_changed or artist_changed or (album_art_changed and album_art_bytes):
+                self.dynamic_island.update_album_art(album_art_bytes)
+            # 同一首歌的情况下，保持使用之前的专辑图缓存
     
     async def get_current_session(self):
         """获取当前媒体会话"""
@@ -4984,7 +5154,26 @@ class MediaGUIFromCurrent(QMainWindow):
 
 if __name__ == "__main__":
     print("正在启动媒体信息显示应用...")
-    print(f"灵动岛模式: {'开启' if DYNAMIC_ISLAND_ENABLED == 1 else '关闭'}")
+    print("=" * 40)
+    print("主要功能状态:")
+    print(f"  灵动岛模式: {'开启' if DYNAMIC_ISLAND_ENABLED == 1 else '关闭'}")
+    print(f"  悬浮歌词: {'开启' if FLOAT_LYRIC_ENABLED == 1 else '关闭'}")
+    
+    # 音频可视化状态
+    viz_status = "关闭"
+    if VISUALIZATION_STYLE == 3:
+        viz_status = "圆形频谱"
+    elif VISUALIZATION_STYLE == 4:
+        viz_status = "波浪形"
+    print(f"  音频可视化: {viz_status}")
+    
+    # 歌词获取相关
+    print(f"  内嵌歌词: {'开启' if EMBEDDED_LYRIC_ENABLED == 1 else '关闭'}")
+    print(f"  本地歌词: {'开启' if LOCAL_LYRIC_ENABLED == 1 else '关闭'}")
+    print(f"  在线歌词: {'开启' if NETWORK_LYRIC_ENABLED == 1 else '关闭'}")
+    print(f"  自动扫描: {'开启' if AUTO_SCAN_ENABLED == 1 else '关闭'}")
+    print(f"  视频歌词适配: {'开启' if VIDEO_LYRIC_ENABLED == 1 else '关闭'}")
+    print("=" * 40)
     
     # 如果设置了自定义歌词目录，删除默认的Lyrics文件夹
     if LYRIC_DIR:
@@ -5007,18 +5196,21 @@ if __name__ == "__main__":
             except Exception as e:
                 print(f"删除旧的LRC文件夹时出错: {e}")
     
-    # 优化字体渲染 - 在创建QApplication之前设置高DPI属性
-    QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)  # 启用高DPI缩放
-    QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps)  # 使用高DPI像素图
+    # 设置高DPI缩放策略
+    QApplication.setHighDpiScaleFactorRoundingPolicy(Qt.HighDpiScaleFactorRoundingPolicy.PassThrough)
     
     # 创建应用程序实例
     app = QApplication(sys.argv)
     
-    # 设置默认字体为微软雅黑UI，大小9
-    app.setFont(QFont("Microsoft YaHei UI", 9))  
+    # 高 DPI 支持在 Qt6 中已默认启用，无需额外设置
+    
+    # 设置默认字体为微软雅黑UI，大小9，确保字体渲染清晰
+    default_font = QFont("Microsoft YaHei UI", 9)
+    default_font.setStyleStrategy(QFont.PreferAntialias)
+    app.setFont(default_font)  
     
     # 创建主窗口
     window = MediaGUIFromCurrent()
     # 不要调用window.show()，因为我们在初始化时已经通过DYNAMIC_ISLAND_ENABLED变量设置了显示模式
     print("应用已启动，正在显示GUI窗口...")
-    sys.exit(app.exec_())
+    sys.exit(app.exec())
